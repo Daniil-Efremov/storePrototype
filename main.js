@@ -48,5 +48,5 @@ document.addEventListener("DOMContentLoaded", () => {
         })
     }
 
-    fetch('getItems.php').then((r) => r.json()).then((r) => constructItems(r));
+    fetch('php/getItems.php').then((r) => r.json()).then((r) => constructItems(r));
 });
