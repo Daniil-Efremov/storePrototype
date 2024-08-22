@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
             img = document.createElement('img'),
             cardBody = document.createElement('div'),
             headder = document.createElement('h5'),
+            headderLink = document.createElement('a'),
             descr = document.createElement('p'),
             btn = document.createElement('a'),
             cardFooter = document.createElement('div');
@@ -42,14 +43,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
             cardBody.classList.add("card-body");
 
-            headder.classList.add("card-title");
-            headder.innerText = item.name;
+            let link = new URL("pages/item.html", document.location);
+            link.searchParams.append("id",item.id);
+            headderLink.setAttribute('href', link.href);
+            headderLink.classList.add("text-decoration-none");
+            headderLink.innerText = item.name
 
-            descr.classList.add("card-text", "overflow-auto", "p-2");
-            descr.style.maxHeight ="100px"
-            descr.innerText = item.description;
+            headder.classList.add("card-title");
+            headder.appendChild(headderLink);
+
+            descr.classList.add("card-text", "overflow-auto");
+            descr.style.maxHeight ="40px"
+            descr.innerText = "Цена в р. :" + item.price;
 
             btn.classList.add("btn", "btn-primary");
+            btn.style.pointerEvents = "none";
             btn.innerText ="Добавить в корзину";
 
             cardFooter.classList.add("card-footer");
