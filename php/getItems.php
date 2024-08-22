@@ -1,11 +1,6 @@
 <?php
 
-$servername = "localhost";
-$username = "root";
-$password = "123";
-$database = 'store';
-
-$conn = new mysqli($servername, $username, $password, $database);
+require 'connectionConfig.php';
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);

@@ -1,6 +1,20 @@
 document.addEventListener("DOMContentLoaded", () => {
     let
+    searchBar = document.getElementById("searchBar"),
+    typeSelector = document.getElementById("typeSelector"),
     mainRow = document.getElementById("mainRow");
+
+    function addCategories(categories){
+        categories.forEach((type) =>{
+            let
+            option = document.createElement('option');
+
+            option.setAttribute('value', type.type);
+            option.innerText = type.type;
+
+            typeSelector.append(option);
+        })
+    };
 
     function constructItems(itemList){
         itemList.forEach((item) => {
@@ -14,7 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
             btn = document.createElement('a'),
             cardFooter = document.createElement('div');
 
-            col.classList.add("col-lg-3", "col-md-6", "col-sm-12");
+            col.classList.add("col-lg-3", "col-md-6", "col-sm-12", "itemColumns");
+            col.setAttribute("data-id", item.id);
+            col.setAttribute("data-name", item.name);
+            col.setAttribute("data-type", item.type);
+            col.setAttribute("data-price", item.price);
 
             card.classList.add("card", "h-100", "w-100");
            
@@ -46,7 +64,38 @@ document.addEventListener("DOMContentLoaded", () => {
             mainRow.appendChild(col);   
                
         })
-    }
+    };
 
-    fetch('php/getItems.php').then((r) => r.json()).then((r) => constructItems(r));
+    function filterItems(){
+        let 
+        itemColumns = document.getElementsByClassName("itemColumns");
+
+        // console.log(itemColumns);
+        Array.from(itemColumns).forEach((col) => {
+            console.log(col.dataset.type.toLowerCase() != typeSelector.value.toLowerCase());
+            col.classList.remove("visually-hidden");
+            if(searchBar.value != ""){
+                if(!col.dataset.name.toLowerCase().includes(searchBar.value.toLowerCase())){
+                    col.classList.add("visually-hidden");
+                }
+            }
+            if(typeSelector.value != ""){
+                if(col.dataset.type.toLowerCase() != typeSelector.value.toLowerCase()){
+                    col.classList.add("visually-hidden");
+                }
+            }
+        });
+
+    };
+
+    fetch('php/getCategories.php').then((r) => r.json()).then((r) => addCategories(r));
+
+    fetch('php/getItems.php').then((r) => r.json()).then((r) =>  constructItems(r));
+
+    searchBar.addEventListener("input", ()=>{
+        filterItems();
+    });
+    typeSelector.addEventListener("input", () => {
+        filterItems();
+    });
 });
