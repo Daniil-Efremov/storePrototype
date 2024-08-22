@@ -13,4 +13,8 @@
 
 _Таблица имеет следующие поля:_
 1. id(int, primarry key, auto increment)
-1. name(VARCAHR 500)
+1. name(VARCAHR 255)
+1. type(VARCAHR 255)
+1. description(TEXT 500)
+1. price(int 11)
+1. img(VARCAHR 255)
