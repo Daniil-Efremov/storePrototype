@@ -1,4 +1,4 @@
-# storePrototype
+# [storePrototype](http://daniiuso.beget.tech/index.html)
 
 ## На сайте реализованы:
 
