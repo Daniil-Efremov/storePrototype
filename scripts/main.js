@@ -78,9 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let 
         itemColumns = document.getElementsByClassName("itemColumns");
 
-        // console.log(itemColumns);
         Array.from(itemColumns).forEach((col) => {
-            console.log(col.dataset.type.toLowerCase() != typeSelector.value.toLowerCase());
             col.classList.remove("visually-hidden");
             if(searchBar.value != ""){
                 if(!col.dataset.name.toLowerCase().includes(searchBar.value.toLowerCase())){
