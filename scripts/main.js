@@ -57,8 +57,12 @@ document.addEventListener("DOMContentLoaded", () => {
             descr.innerText = "Цена в р. :" + item.price;
 
             btn.classList.add("btn", "btn-primary");
-            btn.style.pointerEvents = "none";
-            btn.innerText ="Добавить в корзину";
+            btn.setAttribute('data-itemId', item.id);
+            btn.addEventListener("click", (e)=>{
+                addCartStorage(item);
+                cartUpdate(itemList);
+            });
+            btn.innerText = "Добавить в корзину";
 
             cardFooter.classList.add("card-footer");
 
@@ -72,6 +76,123 @@ document.addEventListener("DOMContentLoaded", () => {
             mainRow.appendChild(col);   
                
         })
+    };
+
+    function addCartStorage(item){
+
+        if(!localStorage.getItem('cart')){
+            let cart = [];
+            cart.push({id:parseInt(item.id), amount:1})
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }else{
+            let cart = JSON.parse(localStorage.getItem('cart'));
+            if( cart.findIndex((cartItem) => cartItem.id == item.id) >= 0){
+                cart[cart.findIndex((cartItem) => cartItem.id == item.id)].amount++;
+                localStorage.setItem('cart', JSON.stringify(cart));
+         }else{
+            cart.push({id:parseInt(item.id), amount:1});
+            localStorage.setItem('cart', JSON.stringify(cart));
+         }
+        }
+        
+    };
+    
+    function decCartStorage(targetId){
+
+        let 
+        cart = JSON.parse(localStorage.getItem('cart'));
+        let
+        id = cart.findIndex((item)=> item.id == targetId);
+        console.log(targetId);
+        // console.log(cart);
+        if(cart[id].amount > 1){
+            cart[id].amount--;
+        }else{
+            cart.splice(id, 1);
+        };
+        
+
+        localStorage.setItem('cart', JSON.stringify(cart));
+    };
+
+    function cartUpdate(mainItems){
+        let 
+        cartData = JSON.parse(localStorage.getItem('cart')),
+        cartModal = document.getElementById("cart"),
+        cartTotalContainer = document.getElementById("cartTotal"),
+        cartTotal = 0;
+
+
+        cartModal.innerHTML = "";
+
+        cartData.forEach((cartEntry)=>{
+            let
+                cartItem = document.createElement('div'),
+                cartItemInfo = document.createElement('div'),
+                cartItemBtn = document.createElement('div'),
+                cartItemName = document.createElement('div'),
+                cartItemPrice = document.createElement('div'),
+                cartItemAmount = document.createElement('div'),
+                cartItemTotal = document.createElement('div'),
+                cartItemAdd = document.createElement('img'),
+                cartItemDec = document.createElement('img'),
+                id = mainItems.findIndex((element)=>element.id.toString() == cartEntry.id.toString());
+                
+            cartItemAdd.setAttribute('data-itemId', cartEntry.id.toString());
+            cartItemAdd.classList.add("cart-icon", "m-1");
+            cartItemAdd.setAttribute("src","bag-plus-fill.svg");
+            cartItemAdd.addEventListener("click", (e) =>{
+                addCartStorage(mainItems[id]);
+                cartUpdate(mainItems);
+            });
+
+            cartItemDec.setAttribute('data-itemId', cartEntry.id.toString());
+            cartItemDec.classList.add("cart-icon", "m-1");
+            cartItemDec.setAttribute("src","bag-dash-fill.svg");
+            cartItemDec.addEventListener("click", (e) =>{
+                decCartStorage(cartEntry.id);
+                cartUpdate(mainItems);
+            });
+
+            cartItemBtn.classList.add("cart-item-btn","col-2", "d-flex", "justify-content-center", "flex-column", "flex-sm-row",);
+
+            cartItemName.innerText = mainItems[id].name;
+            cartItemName.classList.add("cart-item-name", "m-1","col-3");
+
+            cartItemPrice.innerText = "Стоимость: " + mainItems[id].price + "р";
+            cartItemPrice.classList.add("cart-item-price", "m-1","col-3");
+            
+            cartItemAmount.innerText = "Кол-во: " + cartEntry.amount;
+            cartItemAmount.classList.add("cart-item-amount", "m-1" ,"col-3");
+
+            cartItemTotal.innerText = "= " + mainItems[id].price * cartEntry.amount + "р";
+            cartItemTotal.classList.add("cart-item-total", "m-1","col-3");
+            cartTotal += mainItems[id].price * cartEntry.amount;
+            
+            cartItemInfo.classList.add("cart-item-info", "d-flex", "justify-content-between", "col-10");
+
+            cartItem.classList.add("cart-item-wrapper", "cart-modal-font", "d-flex", "justify-content-between", "container-fluid", "m-0", "border-bottom", "border-dark");
+
+            
+
+            cartItemInfo.appendChild(cartItemName);
+            cartItemInfo.appendChild(cartItemPrice);
+            cartItemInfo.appendChild(cartItemAmount);
+            cartItemInfo.appendChild(cartItemTotal);
+
+            cartItemBtn.appendChild(cartItemAdd);
+            cartItemBtn.appendChild(cartItemDec);
+
+            cartItem.appendChild(cartItemInfo);
+            cartItem.appendChild(cartItemBtn);
+
+            cartModal.appendChild(cartItem);
+            // cartItemName.innerText = mainItems[id].name;
+            // cartModal.appendChild(cartItemName);
+
+        });
+        cartTotalContainer.innerText = "Вего: " + cartTotal; 
+
     };
 
     function filterItems(){
@@ -96,7 +217,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     fetch('php/getCategories.php').then((r) => r.json()).then((r) => addCategories(r));
 
-    fetch('php/getItems.php').then((r) => r.json()).then((r) =>  constructItems(r));
+    fetch('php/getItems.php').then((r) => r.json()).then((itemsList) =>  {
+        constructItems(itemsList);
+        cartUpdate(itemsList);
+    });
 
     searchBar.addEventListener("input", ()=>{
         filterItems();
